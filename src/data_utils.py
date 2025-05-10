@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
+import zipfile
 import numpy as np
 import pandas as pd
 import pytz
@@ -21,6 +22,27 @@ import requests
 
 from config import RAW_DATA_DIR
 
+def fetch_raw_trip_data(year: int, month: int) -> Path:
+    URL = f"https://s3.amazonaws.com/tripdata/JC-{year}{month:02}-citibike-tripdata.csv.zip"     
+    response = requests.get(URL)
+
+    if response.status_code == 200:
+        zip_path = RAW_DATA_DIR / f"rides_{year}_{month:02}.zip"
+        open(zip_path, "wb").write(response.content)
+        # Extract the zip file
+        #extracted_dir = RAW_DATA_DIR / "extracted_raw"
+        #extracted_dir.mkdir(exist_ok=True)
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(RAW_DATA_DIR)
+        
+        # Find the CSV file in the extracted directory
+        csv_files = list(RAW_DATA_DIR.glob("*.csv"))
+        if not csv_files:
+            raise Exception(f"No CSV file found in the extracted zip: {zip_path}")
+        
+        return csv_files[0]
+    else:
+        raise Exception(f"{URL} is not available")
 
 def fill_missing_rides_full_range(df, hour_col, location_col, rides_col):
     """

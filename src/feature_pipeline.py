@@ -13,7 +13,10 @@ import hopsworks
 import pandas as pd
 
 import config as config
-from data_utils import fetch_batch_raw_data, transform_data_into_ts_data
+from data_utils import fetch_batch_raw_data, transform_data_into_ts_data, fetch_raw_trip_data
+
+for i in range(3,7):
+    fetch_raw_trip_data(2024,i)
 
 # Configure logging
 logging.basicConfig(
