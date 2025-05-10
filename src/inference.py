@@ -28,10 +28,12 @@ def get_feature_store() -> FeatureStore:
 
 def get_model_predictions(model, features: pd.DataFrame) -> pd.DataFrame:
     # past_rides_columns = [c for c in features.columns if c.startswith('rides_')]
-    predictions = model.predict(features)
+    features_2 = features.copy()
+    features = features.drop(columns=['pickup_hour', 'station_id'])
+    predictions = model.predict(features, predict_disable_shape_check=True)
 
     results = pd.DataFrame()
-    results["station_id"] = features["station_id"].values
+    results["station_id"] = features_2["station_id"].values
     results["predicted_demand"] = predictions.round(0)
 
     return results
@@ -39,18 +41,22 @@ def get_model_predictions(model, features: pd.DataFrame) -> pd.DataFrame:
 
 def load_model_from_registry(version=None):
     from pathlib import Path
-
     import joblib
+    import lightgbm as lgb  # <-- Add this line
 
     project = get_hopsworks_project()
     model_registry = project.get_model_registry()
 
+    # Get the latest version if not specified
     models = model_registry.get_models(name=config.MODEL_NAME)
     model = max(models, key=lambda model: model.version)
     model_dir = model.download()
+
+    # Load the LightGBM model
     model = joblib.load(Path(model_dir) / "lgb_model.pkl")
 
     return model
+
 
 
 def load_metrics_from_registry(version=None):
@@ -91,29 +97,3 @@ def fetch_predictions(hours):
 
     return df
 
-
-def fetch_hourly_rides(hours):
-    current_hour = (pd.Timestamp.now() - timedelta(hours=hours)).floor("h")
-
-    fs = get_feature_store()
-    fg = fs.get_feature_group(name=config.FEATURE_GROUP_NAME, version=1)
-
-    query = fg.select_all()
-    query = query.filter(fg.pickup_hour >= current_hour)
-
-    return query.read()
-
-
-def fetch_days_data(days):
-    current_date = pd.to_datetime(datetime.now(timezone.utc))
-    fetch_data_from = current_date - timedelta(days=(365 + days))
-    fetch_data_to = current_date - timedelta(days=365)
-    print(fetch_data_from, fetch_data_to)
-    fs = get_feature_store()
-    fg = fs.get_feature_group(name=config.FEATURE_GROUP_NAME, version=1)
-
-    query = fg.select_all()
-    # query = query.filter((fg.pickup_hour >= fetch_data_from))
-    df = query.read()
-    cond = (df["pickup_hour"] >= fetch_data_from) & (df["pickup_hour"] <= fetch_data_to)
-    return df[cond]

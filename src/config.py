@@ -26,7 +26,7 @@ FEATURE_VIEW_NAME = "time_series_6_hour_feature_view"
 FEATURE_VIEW_VERSION = 1
 
 
-MODEL_NAME = "bike_demand_predictor_6_hour"
+MODEL_NAME = "bike_demand_predictor_next_hour"
 MODEL_VERSION = 1
 
 FEATURE_GROUP_MODEL_PREDICTION = "bike_6_hour_model_prediction"
