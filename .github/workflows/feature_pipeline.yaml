@@ -1,9 +1,8 @@
 name: citi_bike_6_hour_features_pipeline
 
 on:
-  #schedule:
-    
-  #  - cron: '2 * * * *' # Runs every hour
+  schedule:  
+  - cron: '0 */6 * * *' # Runs every 6 hours
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
