@@ -10,3 +10,4 @@ hopsworks
 pyarrow
 scikit-learn
 confluent-kafka
+lightgbm
