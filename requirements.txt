@@ -1,0 +1,11 @@
+numpy
+pandas
+requests
+dotenv
+scikit-learn
+plotly
+nbformat
+tensorflow
+hopsworks
+pyarrow
+scikit-learn
