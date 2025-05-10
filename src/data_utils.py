@@ -28,7 +28,7 @@ def fetch_raw_trip_data(year: int, month: int) -> Path:
 
     if response.status_code == 200:
         zip_path = RAW_DATA_DIR / f"rides_{year}_{month:02}.zip"
-        open(zip_path, "wb").write(response.content)
+        open(RAW_DATA_DIR, "wb").write(response.content)
         # Extract the zip file
         #extracted_dir = RAW_DATA_DIR / "extracted_raw"
         #extracted_dir.mkdir(exist_ok=True)
