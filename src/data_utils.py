@@ -23,23 +23,27 @@ import requests
 from config import RAW_DATA_DIR
 
 def fetch_raw_trip_data(year: int, month: int) -> Path:
-    URL = f"https://s3.amazonaws.com/tripdata/JC-{year}{month:02}-citibike-tripdata.csv.zip"     
+    URL = f"https://s3.amazonaws.com/tripdata/JC-{year}{month:02}-citibike-tripdata.csv.zip"
     response = requests.get(URL)
 
     if response.status_code == 200:
+        # Ensure the RAW_DATA_DIR exists
+        RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Save the zip file to the RAW_DATA_DIR
         zip_path = RAW_DATA_DIR / f"rides_{year}_{month:02}.zip"
-        open(RAW_DATA_DIR, "wb").write(response.content)
+        with open(zip_path, "wb") as zip_file:
+            zip_file.write(response.content)
+
         # Extract the zip file
-        #extracted_dir = RAW_DATA_DIR / "extracted_raw"
-        #extracted_dir.mkdir(exist_ok=True)
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(RAW_DATA_DIR)
-        
+
         # Find the CSV file in the extracted directory
         csv_files = list(RAW_DATA_DIR.glob("*.csv"))
         if not csv_files:
             raise Exception(f"No CSV file found in the extracted zip: {zip_path}")
-        
+
         return csv_files[0]
     else:
         raise Exception(f"{URL} is not available")
