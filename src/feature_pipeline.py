@@ -2,6 +2,12 @@ import logging
 import os
 import sys
 from datetime import datetime, timedelta, timezone
+# Add the src folder to the Python module search path
+import sys
+from pathlib import Path
+
+# Add the src folder to the Python module search path
+sys.path.append(str(Path(__file__).resolve().parent))
 
 import hopsworks
 import pandas as pd

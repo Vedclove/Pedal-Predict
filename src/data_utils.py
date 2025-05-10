@@ -1,7 +1,7 @@
 import os
 import sys
-
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
+# Add the src folder to the Python module search path
+sys.path.append(str(Path(__file__).resolve().parent))
 
 import calendar
 
