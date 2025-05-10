@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
-import config as config
+import src.config as config
 from inference import (
     get_feature_store,
     get_model_predictions,
